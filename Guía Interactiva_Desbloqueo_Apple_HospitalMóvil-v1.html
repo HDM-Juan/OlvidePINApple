@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://i.imgur.com/7tuGCcn.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistente: Olvidé mi PIN Apple – Hospital del Móvil</title>
+  <meta name="description" content="Guía interactiva paso a paso para desbloquear iPhone/iPad/Mac/Apple Watch por olvido de PIN y para recuperar la contraseña de iCloud (Apple ID). Incluye guardado de progreso.">
+  <style>
+    /* ====== Tipografía & Reset ====== */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+    :root{
+      --rojo:#B22222;
+      --rojo-osc:#8B1A1A;
+      --gris:#6c757d;
+      --bg:#f4f4f4;
+      --ok:#4CAF50;
+      --info:#2196F3;
+      --alert:#DC3545;
+      --verde-ws:#25D366;
+      --maps:#34A853;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family:'Roboto',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      margin:0;background:var(--bg);color:#333;line-height:1.55;
+    }
+    a{color:var(--info);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:1200px;margin:20px auto;background:#fff;border-radius:12px;box-shadow:0 6px 22px rgba(0,0,0,.08);overflow:hidden}
+    header.header{
+      background:linear-gradient(135deg,var(--rojo) 0%,var(--rojo-osc) 100%);
+      color:#fff;display:flex;align-items:center;gap:16px;padding:16px 20px
+    }
+    .header-logo-left{width:60px;height:60px;border-radius:50%;border:3px solid #fff;object-fit:cover;flex-shrink:0}
+    .header-text h1{margin:0;font-size:1.6rem}
+    .header-text .subtitle{margin:2px 0 0;color:#FFE4E1;font-weight:300}
+
+    /* ====== Barra lateral fija de contacto ====== */
+    .side-bar{
+      position:fixed;left:0;top:0;bottom:0;width:72px;
+      background:linear-gradient(135deg,var(--rojo),var(--rojo-osc));
+      display:flex;flex-direction:column;align-items:center;padding:14px 10px;gap:10px;z-index:9999;
+    }
+    .contact-icon{width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;position:relative;transition:transform .15s ease}
+    .contact-icon:hover{transform:translateY(-2px)}
+    .contact-icon .tooltip{
+      position:absolute;left:52px;top:50%;transform:translateY(-50%);
+      background:#111;color:#fff;font-size:12px;padding:6px 8px;border-radius:6px;opacity:0;pointer-events:none;white-space:nowrap
+    }
+    .contact-icon:hover .tooltip{opacity:1}
+    .whatsapp{background:var(--verde-ws)}
+    .phone{background:var(--alert)}
+    .email{background:var(--gris)}
+    .maps{background:var(--maps)}
+    .google{background:linear-gradient(45deg,#4285F4,#34A853,#FBBC05,#EA4335)}
+    .share{background:var(--rojo)}
+
+    main{padding:24px; margin-left:80px} /* deja espacio para la barra lateral */
+
+    /* ====== Controles de impresión/descarga ====== */
+    .print-controls{background:#f8f9fa;padding:12px;border:1px solid #eaeaea;border-radius:10px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .print-controls h4{margin:0 8px 0 0;color:var(--rojo);font-weight:700}
+    .btn{
+      background:var(--rojo);color:#fff;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;font-weight:600;
+    }
+    .btn.secondary{background:var(--info)}
+    .btn.success{background:var(--ok)}
+    .btn.gray{background:#8892a6}
+    .btn.light{background:#e9ecef;color:#333}
+    .btn:hover{filter:brightness(1.03)}
+
+    /* ====== Wizard ====== */
+    .wizard{display:grid;grid-template-columns:300px 1fr;gap:18px}
+    .steps{border:1px solid #eee;border-radius:10px;overflow:hidden}
+    .steps h3{background:#fafafa;margin:0;padding:12px 14px;border-bottom:1px solid #eee;color:#444}
+    .step-list{list-style:none;margin:0;padding:0}
+    .step-list li{padding:10px 14px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;font-size:14px}
+    .step-list li.active{background:#fff3f3;border-left:4px solid var(--rojo);padding-left:10px}
+    .step-list li.done{opacity:.7}
+    .content-card{border:1px solid #eee;border-radius:10px;padding:18px;min-height:420px;position:relative}
+    .content-card h2{margin-top:0;color:var(--rojo)}
+    .progress{height:8px;background:#f1f3f5;border-radius:999px;overflow:hidden;margin:8px 0 16px}
+    .progress > div{height:100%;background:linear-gradient(135deg,var(--rojo),var(--rojo-osc));width:0%}
+    .nav-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+    .notice{border-left:4px solid var(--info);background:#e3f2fd;color:#1565c0;padding:10px 12px;border-radius:6px;margin:10px 0}
+    .danger{border-left:4px solid var(--alert);background:#fdecec;color:#9c1e1e;padding:10px 12px;border-radius:6px;margin:10px 0}
+    .success{border-left:4px solid var(--ok);background:#e8f5e8;color:#2e7d32;padding:10px 12px;border-radius:6px;margin:10px 0}
+    .muted{color:#666;font-size:13px}
+
+    .checklist{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .check{background:#f8f9fa;border:1px solid #eee;border-radius:8px;padding:10px 12px}
+    label{display:block;margin:6px 0 4px}
+    input[type=text],input[type=number],input[type=password],input[type=email],select{
+      width:100%;padding:10px;border:1px solid #ddd;border-radius:8px
+    }
+    .hr{height:1px;background:#efefef;margin:14px 0}
+
+    /* ====== Footer ====== */
+    footer{margin:22px 0 8px;color:#444}
+    .footer-card{
+      background:linear-gradient(135deg,var(--rojo) 0%,var(--rojo-osc) 100%);
+      color:#fff;padding:16px;border-radius:10px
+    }
+    .footer-card small{color:#FFE4E1}
+
+    @media(max-width:980px){
+      .wizard{grid-template-columns:1fr}
+      .steps{order:2}
+      .content-card{order:1}
+    }
+
+    /* Print */
+    @media print{
+      .no-print,.side-bar{display:none!important}
+      main{margin-left:0}
+      .content-card{min-height:auto}
+    }
+  </style>
+</head>
+<body>
+  <!-- ====== Barra lateral de contacto ====== -->
+  <aside class="side-bar no-print" aria-label="Contactos Hospital del Móvil">
+    <a class="contact-icon whatsapp" href="https://wa.me/525552077189" target="_blank" rel="noopener">
+      <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+      </svg>
+      <div class="tooltip">WhatsApp</div>
+    </a>
+    <a class="contact-icon phone" href="tel:+525552077189">
+      <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.02.75-.25 1.02l-2.2 2.2z"/>
+      </svg>
+      <div class="tooltip">Llamar</div>
+    </a>
+    <a class="contact-icon email" href="mailto:zonarosa@hospitaldelmovil.com.mx">
+      <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+      </svg>
+      <div class="tooltip">Email</div>
+    </a>
+    <a class="contact-icon maps" href="https://maps.app.goo.gl/jxgR4i6d2WUpkWfj7" target="_blank" rel="noopener">
+      <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+      </svg>
+      <div class="tooltip">Ubicación</div>
+    </a>
+    <a class="contact-icon google" href="https://g.page/r/CS9sj1oHT0zPEB0/review" target="_blank" rel="noopener">
+      <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      <div class="tooltip">Reseña</div>
+    </a>
+    <button class="contact-icon share" onclick="navigator.share ? navigator.share({title:'Asistente Apple – Hospital del Móvil', url: location.href}) : copyURL()" type="button">
+      <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+      </svg>
+      <div class="tooltip">Compartir</div>
+    </button>
+  </aside>
+
+  <div class="container">
+    <header class="header">
+      <img class="header-logo-left" src="https://i.imgur.com/cqRWu7U.png" alt="Logo Hospital del Móvil">
+      <div class="header-text">
+        <h1>Hospital del Móvil</h1>
+        <p class="subtitle">Asistente para Desbloqueo Apple & Recuperación de Cuenta</p>
+      </div>
+    </header>
+
+    <main>
+      <!-- Controles de impresión/descarga -->
+      <div class="print-controls no-print">
+        <h4>📄 Opciones</h4>
+        <button class="btn" onclick="printToPDF()">🖨️ Imprimir / Guardar PDF</button>
+        <button class="btn success" onclick="downloadHTML()">💾 Descargar HTML</button>
+        <button class="btn secondary" onclick="copyURL()">🔗 Copiar enlace</button>
+        <span class="muted">Tip: para mejor calidad, activa “Imprimir fondos/Gráficos”.</span>
+      </div>
+
+      <!-- Wizard -->
+      <div class="wizard" id="wizard">
+        <!-- Paso lateral -->
+        <div class="steps">
+          <h3>Progreso</h3>
+          <ul class="step-list" id="stepList"></ul>
+        </div>
+
+        <!-- Contenido -->
+        <div class="content-card">
+          <div class="progress"><div id="progressBar"></div></div>
+          <div id="stepContent"></div>
+          <div class="nav-actions">
+            <button class="btn light" onclick="prevStep()" id="backBtn">⬅️ Atrás</button>
+            <button class="btn" onclick="nextStep()" id="nextBtn">Siguiente ➡️</button>
+            <button class="btn gray" onclick="saveProgress()">💾 Guardar y seguir luego</button>
+            <button class="btn light" onclick="resetWizard()">Reiniciar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="notice">
+        <strong>¿Te atoras o te desesperas?</strong> No pasa nada, aquí estamos para ayudarte. <br>
+        Escríbenos por WhatsApp o llámanos y seguimos contigo paso a paso hasta resolverlo. 💪
+      </div>
+
+      <footer>
+        <div class="footer-card">
+          <div><strong>🏥 Hospital del Móvil – Zona Rosa CDMX</strong></div>
+          <div>Florencia 70 Local “F”, Zona Rosa, CDMX · Tel: +52 (55) 5207-7189 · <a href="mailto:zonarosa@hospitaldelmovil.com.mx" style="color:#fff;text-decoration:underline">zonarosa@hospitaldelmovil.com.mx</a></div>
+          <small>© <span id="year"></span> Hospital del Móvil — Documento generado para apoyo a usuarios sin conocimientos técnicos.</small>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // ====== Utilidades básicas ======
+    const $ = (q)=>document.querySelector(q);
+    const stepContent = $("#stepContent");
+    const stepList = $("#stepList");
+    const progressBar = $("#progressBar");
+    const STORAGE_KEY = "HDM_ASISTENTE_APPLE_V1";
+
+    const steps = [
+      { id:"intro", title:"Inicio & Diagnóstico rápido" },
+      { id:"tipo", title:"¿Qué dispositivo tienes?" },
+      { id:"triage", title:"Preguntas clave (elige camino)" },
+      { id:"iphone_unlock", title:"iPhone/iPad · Quitar PIN (borrado seguro)" },
+      { id:"icloud_recovery", title:"Recuperar Apple ID/Contraseña" },
+      { id:"mac_unlock", title:"Mac (laptop) · Recuperar acceso" },
+      { id:"watch_unlock", title:"Apple Watch · Restablecer" },
+      { id:"activation_lock", title:"¿Aparece 'Bloqueo de Activación'?" },
+      { id:"final", title:"Listo / Próximos pasos" }
+    ];
+
+    let state = {
+      current: 0,
+      device: "", // iphone|ipad|ipod|mac|watch|otro
+      knowsAppleID: "",
+      hasTrusted: "",
+      hasBackup: "",
+      owner: "si", // si|no|dudoso
+      seesActivationLock: "no" // si|no|no_sabe
+    };
+
+    // ====== Render de pasos laterales ======
+    function renderStepList(){
+      stepList.innerHTML = "";
+      steps.forEach((s,idx)=>{
+        const li = document.createElement("li");
+        li.textContent = (idx+1)+". "+s.title;
+        if(idx<state.current) li.classList.add("done");
+        if(idx===state.current) li.classList.add("active");
+        stepList.appendChild(li);
+      });
+      progressBar.style.width = ( (state.current)/(steps.length-1) * 100 )+"%";
+      $("#backBtn").style.display = state.current>0 ? "inline-flex":"none";
+      $("#nextBtn").style.display = state.current<steps.length-1 ? "inline-flex":"none";
+    }
+
+    // ====== Contenidos por paso ======
+    function renderStep(){
+      renderStepList();
+      const s = steps[state.current].id;
+      const views = {
+        intro: `
+          <h2>Vamos a ayudarte, sin enredos 😊</h2>
+          <p>Te guiaremos para <strong>quitar el PIN de pantalla</strong> (si lo olvidaste) y/o <strong>recuperar tu contraseña de iCloud (Apple ID)</strong>. Haremos preguntas simples y te diremos exactamente <em>qué debería aparecer en tu pantalla</em> en cada paso.</p>
+          <div class="checklist">
+            <div class="check">
+              <strong>Antes de empezar</strong>
+              <ul>
+                <li>Si <u>no recuerdas tu PIN</u>, será necesario <strong>borrar el dispositivo</strong> y luego restaurar desde copia de seguridad (si existe).</li>
+                <li>Si ves la pantalla <em>“Bloqueo de Activación”</em>, necesitarás la <strong>contraseña del Apple ID</strong> del dueño.</li>
+              </ul>
+            </div>
+            <div class="check">
+              <strong>Qué necesitaremos (si es posible)</strong>
+              <ul>
+                <li>Tu <b>Apple ID</b> (correo) y acceso a tu <b>teléfono confiable</b> para códigos.</li>
+                <li>Una <b>computadora</b> (Mac o Windows) para algunos modelos.</li>
+                <li>Si eres el dueño, <b>alguna prueba de compra</b> por si Apple la solicita.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="notice">Tranqui: si algo se complica, puedes escribirnos por WhatsApp y lo resolvemos contigo en vivo.</div>
+        `,
+        tipo: `
+          <h2>¿Qué dispositivo quieres recuperar?</h2>
+          <label for="deviceSel">Elige una opción</label>
+          <select id="deviceSel" onchange="state.device=this.value">
+            <option value="" disabled ${state.device?"":"selected"}>Selecciona…</option>
+            <option value="iphone" ${state.device==="iphone"?"selected":""}>📱 iPhone</option>
+            <option value="ipad" ${state.device==="ipad"?"selected":""}>📱 iPad</option>
+            <option value="ipod" ${state.device==="ipod"?"selected":""}>🎵 iPod touch</option>
+            <option value="mac" ${state.device==="mac"?"selected":""}>💻 Mac (laptop/escritorio)</option>
+            <option value="watch" ${state.device==="watch"?"selected":""}>⌚ Apple Watch</option>
+            <option value="otro" ${state.device==="otro"?"selected":""}>Otro dispositivo Apple</option>
+          </select>
+          <div class="notice muted">Si tienes más de uno, elige <u>el que urge</u>. Podrás repetir la guía después.</div>
+        `,
+        triage: `
+          <h2>Preguntas rápidas para definir el camino</h2>
+          <label>¿Eres el dueño original del equipo?</label>
+          <select onchange="state.owner=this.value">
+            <option value="si" ${state.owner==="si"?"selected":""}>Sí</option>
+            <option value="dudoso" ${state.owner==="dudoso"?"selected":""}>No estoy seguro</option>
+            <option value="no" ${state.owner==="no"?"selected":""}>No</option>
+          </select>
+
+          <label>¿Sabes la contraseña de tu Apple ID (iCloud)?</label>
+          <select onchange="state.knowsAppleID=this.value">
+            <option value="" ${state.knowsAppleID===""?"selected":""} disabled>Elige…</option>
+            <option value="si" ${state.knowsAppleID==="si"?"selected":""}>Sí</option>
+            <option value="no" ${state.knowsAppleID==="no"?"selected":""}>No</option>
+            <option value="no_seguro" ${state.knowsAppleID==="no_seguro"?"selected":""}>No estoy seguro</option>
+          </select>
+
+          <label>¿Tienes acceso a un número o dispositivo <em>confiable</em> para recibir códigos de Apple?</label>
+          <select onchange="state.hasTrusted=this.value">
+            <option value="" ${state.hasTrusted===""?"selected":""} disabled>Elige…</option>
+            <option value="si" ${state.hasTrusted==="si"?"selected":""}>Sí</option>
+            <option value="no" ${state.hasTrusted==="no"?"selected":""}>No</option>
+            <option value="no_seguro" ${state.hasTrusted==="no_seguro"?"selected":""}>No estoy seguro</option>
+          </select>
+
+          <label>¿Tienes copia de seguridad (iCloud o computadora)?</label>
+          <select onchange="state.hasBackup=this.value">
+            <option value="" ${state.hasBackup===""?"selected":""} disabled>Elige…</option>
+            <option value="si" ${state.hasBackup==="si"?"selected":""}>Sí</option>
+            <option value="no" ${state.hasBackup==="no"?"selected":""}>No</option>
+            <option value="no_seguro" ${state.hasBackup==="no_seguro"?"selected":""}>No estoy seguro</option>
+          </select>
+
+          <label>En pantalla, ¿ves “iPhone/iPad no disponible”, “iPhone desactivado” o “Bloqueo de Activación”?</label>
+          <select onchange="state.seesActivationLock=this.value">
+            <option value="no" ${state.seesActivationLock==="no"?"selected":""}>No, sólo pide PIN</option>
+            <option value="si" ${state.seesActivationLock==="si"?"selected":""}>Sí, Bloqueo de Activación</option>
+            <option value="no_sabe" ${state.seesActivationLock==="no_sabe"?"selected":""}>No estoy seguro</option>
+          </select>
+
+          <div class="hr"></div>
+          <div class="success">
+            <strong>Con estas respuestas elegiremos por ti el camino más rápido</strong>. Dale “Siguiente”. Si algo no corresponde a lo que ves, retrocede con “Atrás” y corrige.
+          </div>
+        `,
+        iphone_unlock: `
+          <h2>iPhone / iPad / iPod touch · Olvidé mi PIN</h2>
+          <p>Para quitar un PIN olvidado hay que <strong>borrar el dispositivo</strong> y luego configurarlo de nuevo (si tienes copia, se recuperan tus datos). Hay dos formas:</p>
+
+          <div class="check">
+            <h3>Opción A) Borrado remoto (si tenías “Buscar” activado)</h3>
+            <ol>
+              <li>Desde otra compu o celular entra a <b>iCloud → Buscar</b> (iCloud.com o la app “Buscar”).</li>
+              <li>Elige tu dispositivo y toca <b>“Borrar iPhone/iPad”</b>.</li>
+              <li>Cuando termine, enciéndelo y sigue el asistente de inicio.</li>
+            </ol>
+            <div class="muted">En pantalla deberías ver: el mapa de Buscar, tu equipo listado, y la opción “Borrar”.</div>
+          </div>
+
+          <div class="check">
+            <h3>Opción B) Modo recuperación con computadora</h3>
+            <p><b>Necesitas</b> un cable y una Mac (Finder) o PC con Windows (app Apple Devices o iTunes).</p>
+            <ol>
+              <li>Apaga el equipo si es posible. Conéctalo a la computadora.</li>
+              <li><b>Entra a modo recuperación</b> según tu modelo (mantén pulsado hasta ver la pantalla con un cable y una laptop):</li>
+            </ol>
+            <ul>
+              <li><b>iPhone 8 o posterior / iPad con Face ID:</b> Pulsa <i>subir volumen</i> y suelta, luego <i>bajar volumen</i> y suelta, luego mantén el <b>botón lateral/superior</b> hasta ver la pantalla de recuperación.</li>
+              <li><b>iPhone 7/7 Plus:</b> Mantén <b>botón lateral</b> + <b>bajar volumen</b> hasta ver la pantalla de recuperación.</li>
+              <li><b>iPhone 6s o anterior / iPad con botón Inicio:</b> Mantén <b>Inicio</b> + <b>superior/lateral</b> hasta ver la pantalla de recuperación.</li>
+            </ul>
+            <ol start="3">
+              <li>En la Mac/PC abre <b>Finder</b>, <b>Apple Devices</b> o <b>iTunes</b>. Te mostrará el iPhone/iPad en modo recuperación con botones <b>“Actualizar”</b> o <b>“Restaurar”</b>.</li>
+              <li>Haz clic en <b>Restaurar</b>. Espera a que descargue el software y termine.</li>
+            </ol>
+            <div class="muted">En la compu deberías ver una ventana con el nombre del dispositivo y la opción “Restaurar”.</div>
+          </div>
+
+          <div class="danger">
+            <strong>Importante:</strong> tras el borrado, si aparece <b>Bloqueo de Activación</b>, necesitarás el Apple ID/contraseña del dueño para continuar.
+          </div>
+        `,
+        icloud_recovery: `
+          <h2>Recuperar Apple ID / Contraseña</h2>
+          <p>Si olvidaste tu contraseña, intenta estas rutas <b>de menor a mayor complejidad</b>:</p>
+          <ol>
+            <li><b>En un dispositivo Apple propio</b>: Ajustes/Configuración → tu nombre → <b>Inicio de sesión y seguridad</b> → <b>Cambiar contraseña</b>. Te pedirá PIN del dispositivo.</li>
+            <li><b>Desde la web</b>: entra a <b>iforgot.apple.com</b>, escribe tu Apple ID (correo) y sigue los pasos para recibir un código en tu número/dispositivo confiable.</li>
+            <li><b>Si NO tienes acceso a los códigos</b>: inicia un <b>proceso de recuperación de cuenta</b> en la misma web. Apple te irá pidiendo datos y puede tardar varios días.</li>
+          </ol>
+          <div class="notice">
+            En pantalla deberías ver: casilla para tu Apple ID, mensajes de verificación en dos pasos y, si no tienes acceso, la opción “¿No puedes usar ningún dispositivo o número confiable?” → <b>“Seguir con recuperación de cuenta”</b>.
+          </div>
+          <div class="muted">Consejo: durante la recuperación, mantén tu número activo y el dispositivo principal encendido y con sesión de iCloud si aún la tenía.</div>
+        `,
+        mac_unlock: `
+          <h2>Mac (laptop/escritorio) · Olvidé mi contraseña</h2>
+          <p>Si olvidaste la contraseña para iniciar sesión en tu Mac, prueba lo siguiente:</p>
+          <ol>
+            <li>En la pantalla de inicio de sesión, haz clic en <b>“¿Olvidaste tu contraseña?”</b> o el botón <b>“?”</b>. Si te ofrece <b>reiniciar y usar Apple ID</b>, acéptalo.</li>
+            <li>Si no aparece, <b>apaga</b> la Mac. Luego <b>enciéndela manteniendo pulsado botón de encendido</b> hasta ver <b>Opciones</b> → <b>Opciones</b> → <b>Continuar</b> (esto abre <b>Recuperación de macOS</b>).</li>
+            <li>Selecciona tu usuario y elige <b>“Siguiente”</b>. Introduce tu Apple ID si te lo pide, o usa <b>Utilidad de restablecimiento</b> para crear contraseña nueva.</li>
+          </ol>
+          <div class="danger">Si activaste <b>FileVault</b>, puede solicitarte tu Apple ID o la <b>clave de recuperación</b>. Tenla a la mano si la configuraste.</div>
+        `,
+        watch_unlock: `
+          <h2>Apple Watch · Olvidé el código</h2>
+          <p>Para quitar el código del Apple Watch hay que <b>borrarlo</b> y configurarlo de nuevo:</p>
+          <h3>Opción A) Con el iPhone emparejado</h3>
+          <ol>
+            <li>En el iPhone: app <b>Watch</b> → <b>General</b> → <b>Restablecer</b> → <b>Borrar contenido y ajustes del Apple Watch</b>.</li>
+            <li>Si te pide, introduce tu Apple ID/contraseña para desactivar el Bloqueo de Activación.</li>
+          </ol>
+          <h3>Opción B) Sin el iPhone</h3>
+          <ol>
+            <li>Coloca el reloj en el <b>cargador</b>.</li>
+            <li>Mantén pulsado el <b>botón lateral</b> hasta ver el deslizador de <b>Apagar</b>.</li>
+            <li>Mantén presionada la opción <b>Apagar</b> (toque firme) y elige <b>Borrar contenido y ajustes</b>.</li>
+          </ol>
+          <div class="danger">Tras el borrado, si aparece Bloqueo de Activación en el Watch o iPhone, necesitarás el Apple ID/contraseña del dueño.</div>
+        `,
+        activation_lock: `
+          <h2>¿Ves “Bloqueo de Activación”?</h2>
+          <p>El Bloqueo de Activación protege el equipo y <b>no se puede quitar sin</b> la contraseña del Apple ID del dueño o la intervención de Apple con <b>prueba de propiedad</b>.</p>
+          <div class="check">
+            <h3>Si conoces el Apple ID</h3>
+            <p>Escribe el <b>correo del Apple ID</b> y la <b>contraseña</b> en la pantalla del dispositivo. Si olvidaste la contraseña, usa la sección “Recuperar Apple ID”.</p>
+          </div>
+          <div class="check">
+            <h3>Si NO conoces el Apple ID o es de otra persona</h3>
+            <ul>
+              <li>Pide al dueño que <b>inicie sesión</b> en la pantalla o que <b>retire el equipo</b> de su cuenta desde <b>icloud.com/find</b> → <b>Eliminar de la cuenta</b>.</li>
+              <li>Si eres el dueño pero no recuerdas los datos, prepara tu <b>comprobante de compra</b> y <b>contacta a Apple</b> para solicitar ayuda.</li>
+            </ul>
+          </div>
+          <div class="danger"><strong>Nota:</strong> no ofrecemos ni recomendamos métodos para saltar este bloqueo. Es una medida de seguridad contra robos.</div>
+        `,
+        final: `
+          <h2>¿Cómo te fue?</h2>
+          <p>Si ya recuperaste el acceso, excelente. Te sugerimos ahora:</p>
+          <ul>
+            <li>Configurar <b>copia de seguridad</b> automática.</li>
+            <li>Verificar tu <b>número confiable</b> y correo de recuperación.</li>
+            <li>Guardar tu <b>contraseña</b> en un gestor (ej. Llavero, 1Password).</li>
+          </ul>
+          <div class="success">¿Aún no queda? Escríbenos por WhatsApp y lo resolvemos contigo. ❤️</div>
+        `
+      };
+
+      stepContent.innerHTML = views[s];
+      afterRenderHooks(s);
+      saveProgress(true); // autosave silencioso
+    }
+
+    function afterRenderHooks(id){
+      // Ajustes de navegación automática según triage
+      if(id==="triage"){
+        // nada
+      }
+      if(id==="tipo"){
+        const sel = $("#deviceSel");
+        if(sel){ sel.addEventListener('change', ()=> {
+          if(["iphone","ipad","ipod"].includes(sel.value)){
+            // Lleva al paso de quitar PIN para iPhone/iPad y a icloud
+            // pero dejaremos que el usuario avance con Siguiente
+          }
+        });}
+      }
+    }
+
+    // ====== Navegación ======
+    function nextStep(){
+      // saltos inteligentes
+      const id = steps[state.current].id;
+      if(id==="tipo"){
+        if(state.device==="mac"){ state.current = steps.findIndex(s=>s.id==="mac_unlock"); renderStep(); return; }
+        if(state.device==="watch"){ state.current = steps.findIndex(s=>s.id==="watch_unlock"); renderStep(); return; }
+        // iPhone/iPad/iPod u otros → continúa
+      }
+      if(id==="triage"){
+        // si reporta bloqueo de activación, llévalo a esa sección
+        if(state.seesActivationLock==="si"){
+          state.current = steps.findIndex(s=>s.id==="activation_lock");
+          renderStep();
+          return;
+        }
+        // si no conoce Apple ID, llévalo a recuperación primero
+        if(state.knowsAppleID==="no" || state.knowsAppleID==="no_seguro"){
+          state.current = steps.findIndex(s=>s.id==="icloud_recovery");
+          renderStep();
+          return;
+        }
+        // si es iPhone/iPad
+        if(["iphone","ipad","ipod"].includes(state.device||"")){
+          state.current = steps.findIndex(s=>s.id==="iphone_unlock");
+          renderStep();
+          return;
+        }
+        // si es Mac
+        if(state.device==="mac"){
+          state.current = steps.findIndex(s=>s.id==="mac_unlock");
+          renderStep();
+          return;
+        }
+        // si es Watch
+        if(state.device==="watch"){
+          state.current = steps.findIndex(s=>s.id==="watch_unlock");
+          renderStep();
+          return;
+        }
+      }
+
+      if(state.current < steps.length-1){
+        state.current++;
+        renderStep();
+      }
+    }
+    function prevStep(){
+      if(state.current>0){ state.current--; renderStep(); }
+    }
+
+    // ====== Guardado local ======
+    function saveProgress(silent=false){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if(!silent) alert("✅ Progreso guardado. Puedes cerrar y volver después.");
+    }
+    function loadProgress(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      try{
+        const saved = JSON.parse(raw);
+        if(saved && typeof saved==="object"){
+          state = Object.assign(state,saved);
+          renderStep();
+          return true;
+        }
+      }catch(e){}
+      return false;
+    }
+    function resetWizard(){
+      if(confirm("¿Reiniciar la guía desde cero?")){ 
+        state = { current:0, device:"", knowsAppleID:"", hasTrusted:"", hasBackup:"", owner:"si", seesActivationLock:"no" };
+        renderStep();
+      }
+    }
+
+    // ====== Print / Download / Share ======
+    function printToPDF(){
+      // recomendaciones rápidas
+      const msg = "Para mejor calidad activa 'Imprimir fondos/Gráficos' y usa márgenes mínimos.";
+      if(confirm("🖨️ "+msg+"\n\n¿Continuar?")) window.print();
+    }
+
+    function downloadHTML(){
+      const htmlContent = document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "Asistente_Desbloqueo_Apple_HdM.html";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      alert("✅ Archivo HTML descargado");
+    }
+
+    function copyURL(){
+      const url = location.href;
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(url).then(()=>alert("🔗 Enlace copiado")).catch(()=>fallbackCopy(url));
+      }else{ fallbackCopy(url); }
+    }
+    function fallbackCopy(text){
+      const ta=document.createElement('textarea');
+      ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy');alert("🔗 Enlace copiado")}catch(e){prompt("Copia el enlace:", text)}
+      document.body.removeChild(ta);
+    }
+
+    // ====== Inicio ======
+    (function init(){
+      // año footer
+      $("#year").textContent = new Date().getFullYear();
+      // construir lista de pasos
+      renderStep();
+      // intentar cargar progreso previo
+      loadProgress();
+    })();
+  </script>
+</body>
+</html>
